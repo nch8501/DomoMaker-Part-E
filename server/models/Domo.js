@@ -56,6 +56,13 @@ DomoSchema.statics.findByOwner = (ownerId, callback) => {
   return DomoModel.find(search).select('name age food _id').exec(callback);
 };
 
+// deletes a domo from the database by using its id
+DomoSchema.statics.deleteById = (domoId, callback) =>
+  // eslint gets angry if there isn't a comment here, since it will make this one
+  // function all one line which exceeds it line character limit
+   DomoModel.deleteOne({ _id: convertId(domoId) }).exec(callback);
+
+
 DomoModel = mongoose.model('Domo', DomoSchema);
 
 module.exports.DomoModel = DomoModel;

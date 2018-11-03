@@ -44,12 +44,15 @@ const makeDomo = (req, res) => {
   return domoPromise;
 };
 
-const deleteDomo = (req, res) =>{
-  console.dir("Deleting Domo");
-  
-  
-  
-}
+// deletes a domo from the database
+const deleteDomo = (req, res) => Domo.DomoModel.deleteById(req.body.domoId, (err, docs) => {
+  if (err) {
+    console.log(err);
+    return res.status(400).json({ error: 'An error occurred' });
+  }
+
+  return res.json({ domos: docs });
+});
 
 const getDomos = (request, response) => {
   const req = request;
@@ -60,7 +63,7 @@ const getDomos = (request, response) => {
       console.log(err);
       return res.status(400).json({ error: 'An error occurred' });
     }
-//console.dir(docs);
+
     return res.json({ domos: docs });
   });
 };

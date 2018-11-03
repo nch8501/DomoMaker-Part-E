@@ -9,26 +9,34 @@ const handleDomo = (e) =>{
   }
   
   sendAjax('POST', $("#domoForm").attr("action"), $("#domoForm").serialize(), function(){
-    loadDomosFromServer();
+    
+    //get csrf token to send to new Domo
+    const csrf = document.querySelector('#domoForm').querySelector('#csrfToken').value;
+    console.dir(csrf);
+    
+    loadDomosFromServer(csrf);
   });
   
   return false;
 };
 
+//deletes a domo from the database
 const handleDeleteDomo = (e) =>{
   e.preventDefault();
-  console.dir('Deleteing Domo');
-  console.dir(e.target.getAttribute('action'));
-  console.dir(e.target.getAttribute('value'));
   
-  //sendAjax('DELETE', e.target.getAttribute('method'), )
+  //get children of the selected domo to delete to get its id
+  const children = e.target.childNodes;
+  const domoId = children[1].value;
   
-  
-  return false;
-  
+  sendAjax('DELETE', e.target.getAttribute('action'), $("#" + domoId).serialize(), function(){
+    loadDomosFromServer();
+  });
+
+  return false;  
 };
 
 const DomoForm = (props) =>{
+  console.dir(props);
   return(
   <form id="domoForm" name="domoForm"
         onSubmit={handleDomo}
@@ -42,7 +50,7 @@ const DomoForm = (props) =>{
     <input id="domoAge" type="text" name="age" placeholder="Domo Age" />
     <label htmlFor="food">Favorite Food: </label>
     <input id="domoFood" type="text" name="food" placeholder="Favorite Food" />
-    <input type="hidden" name="_csrf" value={props.csrf} />
+    <input id="csrfToken" type="hidden" name="_csrf" value={props.csrf} />
     <input className="maheDomoSubmit" type="submit" value="Make Domo" />
   </form>
   );
@@ -64,8 +72,16 @@ const DomoList = function(props){
         <h3 className="domoName">Name: {domo.name}</h3>
         <h3 className="domoAge">Age: {domo.age}</h3>
         <h3 className="domoName">Food: {domo.food}</h3>
-        <h3 className="domoName">Id: {domo._id}</h3>
-        <button onClick={handleDeleteDomo} action="/deleteDomo" action='DELETE' value={domo._id}>Delete Domo</button>
+        <form name="deleteForm"
+              onSubmit={handleDeleteDomo}
+              action="/deleteDomo"
+              method="DELETE"
+              id={domo._id}
+          >
+          <input type="hidden" name="_csrf" value={props.csrf} />
+          <input type="hidden" name="domoId" value={domo._id} />
+          <input type="submit" value="Delete Domo" />
+        </form>     
       </div>
     );
   });
@@ -77,10 +93,10 @@ const DomoList = function(props){
   );
 };
 
-const loadDomosFromServer = () =>{
+const loadDomosFromServer = (csrf) =>{
   sendAjax('GET', '/getDomos', null, (data) =>{
     ReactDOM.render(
-      <DomoList domos={data.domos} />,
+      <DomoList csrf={csrf} domos={data.domos} />,
       document.querySelector("#domos")
     );
   });
@@ -93,11 +109,11 @@ const setup = function(csrf){
   );
   
   ReactDOM.render(
-    <DomoList domos={[]} />,
+    <DomoList csrf={csrf} domos={[]} />,
     document.querySelector("#domos")
   );
   
-  loadDomosFromServer();
+  loadDomosFromServer(csrf);
 };
 
 const getToken = () =>{

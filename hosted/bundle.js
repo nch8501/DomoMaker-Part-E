@@ -1,7 +1,5 @@
 "use strict";
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 var handleDomo = function handleDomo(e) {
   e.preventDefault();
 
@@ -13,25 +11,34 @@ var handleDomo = function handleDomo(e) {
   }
 
   sendAjax('POST', $("#domoForm").attr("action"), $("#domoForm").serialize(), function () {
+
+    //get csrf token to send to new Domo
+    var csrf = document.querySelector('#domoForm').querySelector('#csrfToken').value;
+    console.dir(csrf);
+
+    loadDomosFromServer(csrf);
+  });
+
+  return false;
+};
+
+//deletes a domo from the database
+var handleDeleteDomo = function handleDeleteDomo(e) {
+  e.preventDefault();
+
+  //get children of the selected domo to delete to get its id
+  var children = e.target.childNodes;
+  var domoId = children[1].value;
+
+  sendAjax('DELETE', e.target.getAttribute('action'), $("#" + domoId).serialize(), function () {
     loadDomosFromServer();
   });
 
   return false;
 };
 
-var handleDeleteDomo = function handleDeleteDomo(e) {
-  e.preventDefault();
-  console.dir('Deleteing Domo');
-  console.dir(e.target.getAttribute('action'));
-  console.dir(e.target.getAttribute('value'));
-
-  //sendAjax('DELETE', e.target.getAttribute('method'), )
-
-
-  return false;
-};
-
 var DomoForm = function DomoForm(props) {
+  console.dir(props);
   return React.createElement(
     "form",
     { id: "domoForm", name: "domoForm",
@@ -58,7 +65,7 @@ var DomoForm = function DomoForm(props) {
       "Favorite Food: "
     ),
     React.createElement("input", { id: "domoFood", type: "text", name: "food", placeholder: "Favorite Food" }),
-    React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
+    React.createElement("input", { id: "csrfToken", type: "hidden", name: "_csrf", value: props.csrf }),
     React.createElement("input", { className: "maheDomoSubmit", type: "submit", value: "Make Domo" })
   );
 };
@@ -77,8 +84,6 @@ var DomoList = function DomoList(props) {
   }
 
   var domoNodes = props.domos.map(function (domo) {
-    var _React$createElement;
-
     return React.createElement(
       "div",
       { key: domo._id, className: "domo" },
@@ -102,15 +107,16 @@ var DomoList = function DomoList(props) {
         domo.food
       ),
       React.createElement(
-        "h3",
-        { className: "domoName" },
-        "Id: ",
-        domo._id
-      ),
-      React.createElement(
-        "button",
-        (_React$createElement = { onClick: handleDeleteDomo, action: "/deleteDomo" }, _defineProperty(_React$createElement, "action", "DELETE"), _defineProperty(_React$createElement, "value", domo._id), _React$createElement),
-        "Delete Domo"
+        "form",
+        { name: "deleteForm",
+          onSubmit: handleDeleteDomo,
+          action: "/deleteDomo",
+          method: "DELETE",
+          id: domo._id
+        },
+        React.createElement("input", { type: "hidden", name: "_csrf", value: props.csrf }),
+        React.createElement("input", { type: "hidden", name: "domoId", value: domo._id }),
+        React.createElement("input", { type: "submit", value: "Delete Domo" })
       )
     );
   });
@@ -122,18 +128,18 @@ var DomoList = function DomoList(props) {
   );
 };
 
-var loadDomosFromServer = function loadDomosFromServer() {
+var loadDomosFromServer = function loadDomosFromServer(csrf) {
   sendAjax('GET', '/getDomos', null, function (data) {
-    ReactDOM.render(React.createElement(DomoList, { domos: data.domos }), document.querySelector("#domos"));
+    ReactDOM.render(React.createElement(DomoList, { csrf: csrf, domos: data.domos }), document.querySelector("#domos"));
   });
 };
 
 var setup = function setup(csrf) {
   ReactDOM.render(React.createElement(DomoForm, { csrf: csrf }), document.querySelector("#makeDomo"));
 
-  ReactDOM.render(React.createElement(DomoList, { domos: [] }), document.querySelector("#domos"));
+  ReactDOM.render(React.createElement(DomoList, { csrf: csrf, domos: [] }), document.querySelector("#domos"));
 
-  loadDomosFromServer();
+  loadDomosFromServer(csrf);
 };
 
 var getToken = function getToken() {
