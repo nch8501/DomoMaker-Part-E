@@ -1,5 +1,7 @@
 "use strict";
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var handleDomo = function handleDomo(e) {
   e.preventDefault();
 
@@ -13,6 +15,18 @@ var handleDomo = function handleDomo(e) {
   sendAjax('POST', $("#domoForm").attr("action"), $("#domoForm").serialize(), function () {
     loadDomosFromServer();
   });
+
+  return false;
+};
+
+var handleDeleteDomo = function handleDeleteDomo(e) {
+  e.preventDefault();
+  console.dir('Deleteing Domo');
+  console.dir(e.target.getAttribute('action'));
+  console.dir(e.target.getAttribute('value'));
+
+  //sendAjax('DELETE', e.target.getAttribute('method'), )
+
 
   return false;
 };
@@ -63,9 +77,11 @@ var DomoList = function DomoList(props) {
   }
 
   var domoNodes = props.domos.map(function (domo) {
+    var _React$createElement;
+
     return React.createElement(
       "div",
-      { key: domo.id, className: "domo" },
+      { key: domo._id, className: "domo" },
       React.createElement("img", { src: "/assets/img/domoface.jpeg", alt: "domo face", className: "domoFace" }),
       React.createElement(
         "h3",
@@ -84,6 +100,17 @@ var DomoList = function DomoList(props) {
         { className: "domoName" },
         "Food: ",
         domo.food
+      ),
+      React.createElement(
+        "h3",
+        { className: "domoName" },
+        "Id: ",
+        domo._id
+      ),
+      React.createElement(
+        "button",
+        (_React$createElement = { onClick: handleDeleteDomo, action: "/deleteDomo" }, _defineProperty(_React$createElement, "action", "DELETE"), _defineProperty(_React$createElement, "value", domo._id), _React$createElement),
+        "Delete Domo"
       )
     );
   });

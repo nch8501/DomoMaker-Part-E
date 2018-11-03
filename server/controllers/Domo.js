@@ -44,6 +44,13 @@ const makeDomo = (req, res) => {
   return domoPromise;
 };
 
+const deleteDomo = (req, res) =>{
+  console.dir("Deleting Domo");
+  
+  
+  
+}
+
 const getDomos = (request, response) => {
   const req = request;
   const res = response;
@@ -53,7 +60,7 @@ const getDomos = (request, response) => {
       console.log(err);
       return res.status(400).json({ error: 'An error occurred' });
     }
-
+//console.dir(docs);
     return res.json({ domos: docs });
   });
 };
@@ -62,3 +69,4 @@ const getDomos = (request, response) => {
 module.exports.makerPage = makerPage;
 module.exports.getDomos = getDomos;
 module.exports.make = makeDomo;
+module.exports.delete = deleteDomo;

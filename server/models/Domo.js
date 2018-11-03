@@ -45,6 +45,7 @@ DomoSchema.statics.toAPI = (doc) => ({
   name: doc.name,
   age: doc.age,
   food: doc.food,
+  id: doc._id,
 });
 
 DomoSchema.statics.findByOwner = (ownerId, callback) => {
@@ -52,7 +53,7 @@ DomoSchema.statics.findByOwner = (ownerId, callback) => {
     owner: convertId(ownerId),
   };
 
-  return DomoModel.find(search).select('name age food').exec(callback);
+  return DomoModel.find(search).select('name age food _id').exec(callback);
 };
 
 DomoModel = mongoose.model('Domo', DomoSchema);
