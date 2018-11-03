@@ -14,7 +14,6 @@ var handleDomo = function handleDomo(e) {
 
     //get csrf token to send to new Domo
     var csrf = document.querySelector('#domoForm').querySelector('#csrfToken').value;
-    console.dir(csrf);
 
     loadDomosFromServer(csrf);
   });
@@ -38,7 +37,6 @@ var handleDeleteDomo = function handleDeleteDomo(e) {
 };
 
 var DomoForm = function DomoForm(props) {
-  console.dir(props);
   return React.createElement(
     "form",
     { id: "domoForm", name: "domoForm",

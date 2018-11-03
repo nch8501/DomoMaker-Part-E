@@ -12,7 +12,6 @@ const handleDomo = (e) =>{
     
     //get csrf token to send to new Domo
     const csrf = document.querySelector('#domoForm').querySelector('#csrfToken').value;
-    console.dir(csrf);
     
     loadDomosFromServer(csrf);
   });
@@ -36,7 +35,6 @@ const handleDeleteDomo = (e) =>{
 };
 
 const DomoForm = (props) =>{
-  console.dir(props);
   return(
   <form id="domoForm" name="domoForm"
         onSubmit={handleDomo}
